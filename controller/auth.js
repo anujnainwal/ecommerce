@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const nodeMailer = require("nodemailer");
 const crypto = require("crypto");
 const config = require("../config/config");
+const { validationResult } = require("express-validator");
 
 const transporter = nodeMailer.createTransport({
   host: config.HOST,
@@ -26,32 +27,54 @@ exports.getSignup = (req, res, next) => {
   res.render("auth/signup", {
     path: "/signup",
     pageTitle: "Signup",
-    isAuthenticated: false,
     errorMessage: message,
+    oldInput: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+    validationErrors: [],
   });
 };
 exports.postSignup = (req, res, next) => {
   let email = req.body.email;
   let password = req.body.password;
   let confirmPassword = req.body.confirmPassword;
-  User.findOne({ email: email })
-    .then((userDoc) => {
-      if (userDoc) {
-        req.flash(
-          "error",
-          "This email has already been used. Please pick new one."
-        );
-        return res.redirect("/signup");
-      }
-      return bcrypt.hash(password, 12).then((hashPassword) => {
-        const user = new User({
-          email: email,
-          password: hashPassword,
-          cart: { items: [] },
-        });
-        return user.save();
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors.array());
+    return res.status(422).render("auth/signup", {
+      path: "/signup",
+      pageTitle: "Signup",
+      errorMessage: errors.array()[0].msg,
+      oldInput: {
+        email: email,
+        password: password,
+        confirmPassword: req.body.confirmPassword,
+      },
+      validationErrors: errors.array(),
+    });
+  }
+  // User.findOne({ email: email })
+  // .then((userDoc) => {
+  // if (userDoc) {
+  //   req.flash(
+  //     "error",
+  //     "This email has already been used. Please pick new one."
+  //   );
+  //   return res.redirect("/signup");
+  // }
+  bcrypt
+    .hash(password, 12)
+    .then((hashPassword) => {
+      const user = new User({
+        email: email,
+        password: hashPassword,
+        cart: { items: [] },
       });
+      return user.save();
     })
+    // })
 
     .then(() => {
       transporter.sendMail({
@@ -74,19 +97,49 @@ exports.getLogin = (req, res, next) => {
   res.render("auth/login", {
     path: "/login",
     pageTitle: "Login",
-    isAuthenticated: false,
     errorMessage: message,
+    oldInput: {
+      email: "",
+      password: "",
+    },
+    validationErrors: [],
   });
 };
 
 exports.postLogin = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors.array());
+    return res.status(422).render("auth/login", {
+      path: "/login",
+      pageTitle: "Login",
+      errorMessage: errors.array()[0].msg,
+      oldInput: {
+        email: email,
+        password: password,
+      },
+      validationErrors: errors.array(),
+    });
+  }
+
   User.findOne({ email: email })
     .then((user) => {
       if (!user) {
         req.flash("error", "Invalid email and password");
-        return res.redirect("/login");
+
+        return res.status(422).render("auth/login", {
+          path: "/login",
+          pageTitle: "Login",
+          errorMessage: "Invalid Crreedentails",
+          oldInput: {
+            email: email,
+            password: password,
+            confirmPassword: req.body.confirmPassword,
+          },
+          validationErrors: [],
+        });
       }
       bcrypt.compare(password, user.password).then((matchPassword) => {
         if (matchPassword) {
@@ -94,7 +147,17 @@ exports.postLogin = (req, res, next) => {
           req.session.user = user;
           return res.redirect("/");
         }
-        res.redirect("/login");
+        return res.status(422).render("auth/login", {
+          path: "/login",
+          pageTitle: "Login",
+          errorMessage: "Invalid Crreedentails",
+          oldInput: {
+            email: email,
+            password: password,
+            confirmPassword: req.body.confirmPassword,
+          },
+          validationErrors: [],
+        });
       });
     })
     .catch((err) => console.log(err));
