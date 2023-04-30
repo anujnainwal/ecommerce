@@ -5,7 +5,7 @@ const fileHelper = require("../util/file");
 const { validationResult } = require("express-validator");
 
 const Product = require("../models/product");
-
+const ITEM_PER_PAGE = 1;
 exports.getAddProduct = (req, res, next) => {
   res.render("admin/edit-product", {
     pageTitle: "Add Product",
@@ -176,15 +176,30 @@ exports.postEditProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
+  const page = +req.query.page || 1;
+  let totalItems;
+  //count
   Product.find({ userId: req.user._id })
-    // .select('title price -_id')
-    // .populate('userId', 'name')
+    .countDocuments()
+    .then((numProducts) => {
+      totalItems = numProducts;
+
+      return Product.find({ userId: req.user._id })
+        .skip((page - 1) * ITEM_PER_PAGE)
+        .limit(ITEM_PER_PAGE);
+    })
     .then((products) => {
-      console.log(products);
       res.render("admin/products", {
         prods: products,
         pageTitle: "Admin Products",
         path: "/admin/products",
+        currentPage: page,
+        totalProducts: totalItems,
+        hasNextPage: ITEM_PER_PAGE * page < totalItems,
+        hasPrevPage: page > 1,
+        nextPage: page + 1,
+        privousPage: page - 1,
+        lastPage: Math.ceil(totalItems / ITEM_PER_PAGE),
       });
     })
     .catch((err) => {
@@ -195,7 +210,7 @@ exports.getProducts = (req, res, next) => {
 };
 
 exports.postDeleteProduct = (req, res, next) => {
-  const prodId = req.body.productId;
+  const prodId = req.params.productId;
   Product.findById(prodId)
     .then((product) => {
       if (!product) {
@@ -206,7 +221,8 @@ exports.postDeleteProduct = (req, res, next) => {
     })
     .then(() => {
       console.log("DESTROYED PRODUCT");
-      res.redirect("/admin/products");
+      // res.redirect("/admin/products");
+      res.status(200).json({ message: "Product deleted successfully." });
     })
     .catch((err) => {
       const error = new Error(err);
