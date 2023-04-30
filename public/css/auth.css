@@ -4,13 +4,3 @@
   margin: auto;
   display: block;
 }
-.login_error_message {
-  width: 50%;
-  margin: auto;
-  padding: 15px;
-  background: #eb27136b;
-  border-radius: 10px;
-}
-.resetLink {
-  text-align: center;
-}

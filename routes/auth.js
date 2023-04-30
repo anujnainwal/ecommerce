@@ -1,12 +1,15 @@
 const express = require("express");
-
-const authController = require("../controller/auth");
 const { check, body } = require("express-validator");
+
+const authController = require("../controllers/auth");
+const User = require("../models/user");
+
 const router = express.Router();
-const userModel = require("../models/user.model");
 
 router.get("/login", authController.getLogin);
+
 router.get("/signup", authController.getSignup);
+
 router.post(
   "/login",
   [
@@ -27,40 +30,48 @@ router.post(
   [
     check("email")
       .isEmail()
-      .withMessage("Please enter valid email address")
+      .withMessage("Please enter a valid email.")
       .custom((value, { req }) => {
-        // if (value === "test@test.com") {
-        //   throw new Error("This email address is forridbeed");
+        // if (value === 'test@test.com') {
+        //   throw new Error('This email address if forbidden.');
         // }
-        return userModel.findOne({ email: value }).then((user) => {
-          if (user) {
+        // return true;
+        return User.findOne({ email: value }).then((userDoc) => {
+          if (userDoc) {
             return Promise.reject(
-              `This ${value} email already exists. Please choose a different email.`
+              "E-Mail exists already, please pick a different one."
             );
           }
         });
-        return true;
       })
       .normalizeEmail(),
-    body("password", "Please enter only text and number combination password")
+    body(
+      "password",
+      "Please enter a password with only numbers and text and at least 5 characters."
+    )
       .isLength({ min: 5 })
       .isAlphanumeric()
       .trim(),
     body("confirmPassword")
+      .trim()
       .custom((value, { req }) => {
         if (value !== req.body.password) {
-          throw new Error("Password and confirm Password not match");
+          throw new Error("Passwords have to match!");
         }
         return true;
-      })
-      .trim(),
+      }),
   ],
   authController.postSignup
 );
 
-router.get("/reset", authController.getReset);
-router.post("/reset", authController.postReset);
-router.get("/reset/:token", authController.getNewPassword);
-router.post("/new-password", authController.postNewPassword);
 router.post("/logout", authController.postLogout);
+
+router.get("/reset", authController.getReset);
+
+router.post("/reset", authController.postReset);
+
+router.get("/reset/:token", authController.getNewPassword);
+
+router.post("/new-password", authController.postNewPassword);
+
 module.exports = router;

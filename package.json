@@ -1,5 +1,5 @@
 {
-  "name": "nodejs-complete-guide",
+  "name": "nodejs_ecommerce",
   "version": "1.0.0",
   "description": "Complete Node.js Guide",
   "main": "app.js",
@@ -8,7 +8,7 @@
     "start": "nodemon app.js",
     "start-server": "node app.js"
   },
-  "author": "Maximilian Schwarzmüller",
+  "author": "Anuj singh Nainwal",
   "license": "ISC",
   "devDependencies": {
     "nodemon": "^2.0.22"
@@ -28,8 +28,11 @@
     "express-validator": "^7.0.1",
     "mongodb": "^5.2.0",
     "mongoose": "^7.0.3",
+    "multer": "^1.4.5-lts.1",
     "mysql2": "^3.2.0",
     "nodemailer": "^6.9.1",
+    "nodemailer-sendgrid-transport": "^0.2.0",
+    "pdfkit": "^0.13.0",
     "pug": "^3.0.2",
     "sequelize": "^6.30.0"
   }

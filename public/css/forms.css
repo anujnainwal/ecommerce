@@ -21,13 +21,8 @@
 .form-control textarea:focus {
   outline-color: #00695c;
 }
-.form-control input.invalid {
-  border: 2px solid red;
-}
-.login_error_message {
-  width: 50%;
-  margin: auto;
-  padding: 15px;
-  background: #eb27136b;
-  border-radius: 10px;
+
+.form-control input.invalid,
+.form-control textarea.invalid {
+  border-color: red;
 }
