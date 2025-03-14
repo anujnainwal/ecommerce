@@ -1,5 +1,10 @@
 import Joi from "joi";
-import { internalServerError, successWithResponse, validationErrorResponse } from "../../utils/responseHelper";
+import {
+  internalServerError,
+  successWithResponse,
+  validationErrorResponse,
+} from "../../utils/responseHelper.js";
+import OrderModel from "../../models/order.model.js";
 const updateOrderSchema = Joi.object({
   userId: Joi.string().min(3).max(40),
   orderItems: Joi.array().items(

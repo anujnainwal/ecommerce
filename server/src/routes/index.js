@@ -5,6 +5,7 @@ import brandRouter from "./brand/brand.routes.js";
 import productRouter from "./products/product.routes.js";
 import cartRouter from "./cart/carts.routes.js";
 import addressRouter from "./address/address.routes.js";
+import orderRouter from "./orders/order.routes.js";
 const router = express.Router();
 
 router.use("/api/v1/auth", authRouter);
@@ -13,5 +14,6 @@ router.use("/api/v1/brand", brandRouter);
 router.use("/api/v1/product", productRouter);
 router.use("/api/v1/cart", cartRouter);
 router.use("/api/v1/address", addressRouter);
+router.use("/api/v1/order", orderRouter);
 
 export default router;

@@ -1,8 +1,8 @@
-import OrderModel from "../../models/order.model";
+import OrderModel from "../../models/order.model.js";
 import {
   internalServerError,
   successWithResponse,
-} from "../../utils/responseHelper";
+} from "../../utils/responseHelper.js";
 
 const fetchAllOrders = async (req, res) => {
   try {

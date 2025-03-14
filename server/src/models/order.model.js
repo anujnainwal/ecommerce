@@ -26,7 +26,7 @@ const orderSchema = new mongoose.Schema(
     ],
     totalAmount: {
       type: Number,
-      required: true,
+      default: 0,
     },
     orderStatus: {
       type: String,
@@ -38,7 +38,6 @@ const orderSchema = new mongoose.Schema(
       ref: "addresses",
       required: true,
     },
-    
   },
   {
     timestamps: true,
@@ -48,8 +47,9 @@ const orderSchema = new mongoose.Schema(
 
 orderSchema.pre("save", async function (next) {
   const order = this;
+
   order.totalAmount = order.orderItems.reduce((sum, item) => {
-    return sum + item.quantity * item.productId.price;
+    return sum + item.quantity * item.price;
   }, 0);
 });
 

@@ -1,5 +1,9 @@
-import OrderModel from "../../models/order.model";
-import { internalServerError, successWithResponse, validationErrorResponse } from "../../utils/responseHelper";
+import OrderModel from "../../models/order.model.js";
+import {
+  internalServerError,
+  successWithResponse,
+  validationErrorResponse,
+} from "../../utils/responseHelper.js";
 
 const getOrderDetails = async (req, res) => {
   const { orderId } = req.params;

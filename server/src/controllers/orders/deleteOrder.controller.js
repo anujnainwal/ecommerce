@@ -1,9 +1,9 @@
-import OrderModel from "../../models/order.model";
+import OrderModel from "../../models/order.model.js";
 import {
   internalServerError,
   successWithResponse,
   validationErrorResponse,
-} from "../../utils/responseHelper";
+} from "../../utils/responseHelper.js";
 
 const deleteOrder = async (req, res) => {
   const { orderId } = req.params;
